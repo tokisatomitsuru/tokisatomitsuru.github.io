@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timber CAD Simulator</title>
+  <script type="module" crossorigin src="/assets/index-C8Eqjwus.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-rsIv7JDU.css">
+</head>
+
+<body>
+  <div id="app"></div>
+  <div id="ui-overlay"
+    style="display:none; position:absolute; top: 15px; left: 15px; color: white; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 8px; font-family: sans-serif; pointer-events: none; border: 1px solid rgba(255,255,255,0.3);">
+    <h2 style="margin-bottom: 10px; font-size: 18px; border-bottom: 1px solid #555; padding-bottom: 5px;">CAD Edit Mode
+    </h2>
+    <ul style="padding-left: 20px; font-size: 14px; line-height: 1.8;">
+      <li><b>左クリック (水色マス):</b> ノード（関節）を配置</li>
+      <li><b>左クリック (ノード):</b> ノードを選択</li>
+      <li><b>左クリック (別ノード):</b> 選択中ノードから棒を引く</li>
+      <li><b>右クリック (ノード):</b> 吊り下げ用ワイヤーを着脱</li>
+      <li><b>Deleteキー / Backspace:</b> 選択中のノードを削除</li>
+    </ul>
+    <p style="margin-top: 15px; font-size: 12px; color:#aaa;">※画面をドラッグして視点移動できます</p>
+  </div>
+</body>
+
+</html>
