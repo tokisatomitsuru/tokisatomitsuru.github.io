@@ -23,9 +23,15 @@
     </span>
   </div>
 
+  <!-- 常時表示: 目的地への方向と距離 (フェードなし・近づくと表示) -->
+  <div class="direction-hud" id="directionHud">
+    <span class="direction-arrow" id="directionArrow"><i class="fa-solid fa-location-arrow"></i></span>
+    <span class="direction-distance-text">距離: <span id="distanceVal">--</span></span>
+  </div>
+
   <!-- メインコンテンツ (基本は真っ暗で、近づくとフェードインしてくる) -->
   <main class="minimal-experience-container">
-    
+
     <!-- 接近時に中央に浮かび上がるコンテンツ -->
     <div class="proximity-fade-content" id="proximityFadeContent">
       <div class="target-preview-container" id="targetImageContainer" style="display: none;">
@@ -33,11 +39,6 @@
       </div>
       <h1 class="target-name" id="targetName">目的地を探しています</h1>
       <p class="target-desc" id="targetDesc">近くに目的地はありません。</p>
-      
-      <!-- 近づいたときだけ小さく出る距離情報 -->
-      <div class="minimal-distance" id="distanceValContainer">
-        距離: <span id="distanceVal">--</span>
-      </div>
     </div>
 
   </main>

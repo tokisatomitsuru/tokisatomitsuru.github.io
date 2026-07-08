@@ -10,6 +10,9 @@ let currentCoords = null; // { lat, lng }
 let isSimMode = false;
 let closestLocation = null;
 
+// コンパス方位 (0=北, 時計回り)。センサー未取得時は null (北基準にフォールバック)
+let deviceHeading = null;
+
 // 到達トリガーの履歴管理
 const triggeredLocations = new Set();
 
@@ -29,6 +32,10 @@ const gpsAccuracy = document.getElementById("gpsAccuracy");
 const targetImageContainer = document.getElementById("targetImageContainer");
 const targetImage = document.getElementById("targetImage");
 const proximityFadeContent = document.getElementById("proximityFadeContent");
+
+// 方向インジケーター (常時フル表示・フェードなし)
+const directionHud = document.getElementById("directionHud");
+const directionArrow = document.getElementById("directionArrow");
 
 // シミュレータ関連
 const simToggleBtn = document.getElementById("simToggleBtn");
@@ -88,10 +95,75 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === mediaModal) closeMediaModal();
   });
 
+  // 初回タップでメディア再生と方位センサーを事前にアンロックしておく
+  // (これにより、目的地到達時にタップなしで自動再生できる)
+  document.addEventListener("pointerdown", primeInteraction, { once: true });
+
   // 即座にGPS開始（スタートオーバーレイなし）
   initMap();
   startTracking();
 });
+
+// 初回タップ時の下準備: 自動再生の解禁 + 方位センサーの許可・購読開始
+function primeInteraction() {
+  if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+    // iOS: ユーザー操作の文脈でのみ許可ダイアログを出せる
+    DeviceOrientationEvent.requestPermission()
+      .then(state => {
+        if (state === "granted") startCompass();
+      })
+      .catch(err => console.warn("方位センサーの許可取得に失敗", err));
+  } else {
+    startCompass();
+  }
+
+  unlockMediaAutoplay(playerAudio);
+  unlockMediaAutoplay(playerVideo);
+}
+
+// メディア要素を一度ミュート再生→即停止し、以降タップなしで自動再生できるようにする
+function unlockMediaAutoplay(mediaEl) {
+  try {
+    const wasMuted = mediaEl.muted;
+    mediaEl.muted = true;
+    const playPromise = mediaEl.play();
+    if (playPromise && typeof playPromise.then === "function") {
+      playPromise
+        .then(() => {
+          mediaEl.pause();
+          mediaEl.muted = wasMuted;
+        })
+        .catch(() => {
+          mediaEl.muted = wasMuted;
+        });
+    } else {
+      mediaEl.muted = wasMuted;
+    }
+  } catch (e) {
+    console.warn("メディアのアンロックに失敗", e);
+  }
+}
+
+// 方位センサーの購読を開始
+function startCompass() {
+  const handler = (event) => {
+    let heading;
+    if (typeof event.webkitCompassHeading === "number") {
+      heading = event.webkitCompassHeading; // iOS: 既に真北基準・時計回り
+    } else if (event.alpha != null) {
+      heading = 360 - event.alpha; // Android等: 反時計回りのalphaを時計回りに変換
+    } else {
+      return;
+    }
+    deviceHeading = (heading + 360) % 360;
+  };
+
+  if ("ondeviceorientationabsolute" in window) {
+    window.addEventListener("deviceorientationabsolute", handler, true);
+  } else {
+    window.addEventListener("deviceorientation", handler, true);
+  }
+}
 
 function showToast(message) {
   toastMsg.textContent = message;
@@ -256,6 +328,42 @@ function getDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+// 2地点間の方位角を計算 (0=北, 時計回り)
+function computeBearing(lat1, lon1, lat2, lon2) {
+  const toRad = deg => deg * Math.PI / 180;
+  const phi1 = toRad(lat1);
+  const phi2 = toRad(lat2);
+  const deltaLambda = toRad(lon2 - lon1);
+
+  const y = Math.sin(deltaLambda) * Math.cos(phi2);
+  const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(deltaLambda);
+  const theta = Math.atan2(y, x);
+
+  return (theta * 180 / Math.PI + 360) % 360;
+}
+
+// 方向インジケーターの矢印回転・表示制御
+function updateDirectionIndicator(userLat, userLng, target, distance) {
+  if (!directionHud || !directionArrow) return;
+
+  if (!target) {
+    directionHud.classList.remove("visible");
+    return;
+  }
+
+  const bearing = computeBearing(userLat, userLng, target.lat, target.lng);
+  const heading = deviceHeading != null ? deviceHeading : 0; // センサー未取得時は北基準にフォールバック
+  // fa-location-arrow は既定で右上(45度)を指す形状のため、-45度分補正する
+  const rotation = (bearing - heading + 360) % 360 - 45;
+  directionArrow.style.transform = `rotate(${rotation}deg)`;
+
+  if (distance <= MAX_FADE_DISTANCE) {
+    directionHud.classList.add("visible");
+  } else {
+    directionHud.classList.remove("visible");
+  }
+}
+
 // 全ての目的地との距離判定とUI制御
 function processDistances(userLat, userLng) {
   if (locations.length === 0) {
@@ -317,6 +425,9 @@ function processDistances(userLat, userLng) {
 
   // フェードイン効果
   updateProximityEffects(distance);
+
+  // 方向インジケーター (フェードなし・近づいたら表示)
+  updateDirectionIndicator(userLat, userLng, nearestLoc, distance);
 
   // 各目的地の到達判定距離 (個別設定 > デフォルト)
   const triggerDist = (nearestLoc.triggerDistance != null)
