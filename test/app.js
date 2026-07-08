@@ -78,13 +78,26 @@ let audioVolumeRAF = null;
 
 // 起動初期化
 document.addEventListener("DOMContentLoaded", () => {
-  locations = getLocations();
+  // 最優先で登録: 他の初期化処理でエラーが起きても、このボタンだけは確実に反応するようにする
+  startConsentBtn.addEventListener("click", () => {
+    startOverlay.classList.remove("active");
+    try { primeInteraction(); } catch (e) { console.warn("primeInteraction failed", e); }
+    try { initMap(); } catch (e) { console.warn("initMap failed", e); }
+    try { startTracking(); } catch (e) { console.warn("startTracking failed", e); }
+  });
 
-  // 管理画面で設定された感度・見た目を反映
-  const settings = getSettings();
-  DEFAULT_TRIGGER_DISTANCE = settings.defaultTriggerDistance;
-  MAX_FADE_DISTANCE = settings.maxFadeDistance;
-  APPROACH_COLOR = hexToRgb(settings.approachColor);
+  try {
+    locations = getLocations();
+
+    // 管理画面で設定された感度・見た目を反映
+    const settings = getSettings();
+    DEFAULT_TRIGGER_DISTANCE = settings.defaultTriggerDistance;
+    MAX_FADE_DISTANCE = settings.maxFadeDistance;
+    APPROACH_COLOR = hexToRgb(settings.approachColor);
+  } catch (e) {
+    console.warn("初期データの読み込みに失敗しました。デフォルト値を使用します。", e);
+    locations = DEFAULT_LOCATIONS;
+  }
 
   // イベント登録
   simToggleBtn.addEventListener("click", () => simPanel.classList.toggle("active"));
@@ -97,14 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // モーダル外クリックで閉じる
   mediaModal.addEventListener("click", (e) => {
     if (e.target === mediaModal) closeMediaModal();
-  });
-
-  // 「はい、体験を始める」ボタン: 音声再生と方位センサーの許可をまとめて取得してから開始
-  startConsentBtn.addEventListener("click", () => {
-    startOverlay.classList.remove("active");
-    primeInteraction();
-    initMap();
-    startTracking();
   });
 });
 

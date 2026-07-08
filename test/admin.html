@@ -77,19 +77,19 @@
           <div class="form-group">
             <label for="settingBgColor">近づくにつれて変化する色</label>
             <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
-              <input type="color" id="settingBgColor" value="#1a0a2e" style="width: 36px; height: 28px; border: 1px solid var(--border); background: transparent; cursor: pointer; padding: 2px;">
-              <span id="settingBgColorHex" style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">#1a0a2e</span>
+              <input type="color" id="settingBgColor" value="#4c1d95" style="width: 36px; height: 28px; border: 1px solid var(--border); background: transparent; cursor: pointer; padding: 2px;">
+              <span id="settingBgColorHex" style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">#4c1d95</span>
             </div>
           </div>
           <div class="form-group" style="margin-top: 8px;">
             <label style="margin-bottom: 6px; display: block;">プリセット</label>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <button type="button" class="bg-preset-btn" data-color="#1a0a2e" style="background:#1a0a2e; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
-              <button type="button" class="bg-preset-btn" data-color="#0a1a2e" style="background:#0a1a2e; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
-              <button type="button" class="bg-preset-btn" data-color="#0a2e14" style="background:#0a2e14; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
-              <button type="button" class="bg-preset-btn" data-color="#2e0a0a" style="background:#2e0a0a; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
-              <button type="button" class="bg-preset-btn" data-color="#1a1a0a" style="background:#1a1a0a; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
-              <button type="button" class="bg-preset-btn" data-color="#0a2e2e" style="background:#0a2e2e; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
+              <button type="button" class="bg-preset-btn" data-color="#4c1d95" style="background:#4c1d95; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
+              <button type="button" class="bg-preset-btn" data-color="#1e3a8a" style="background:#1e3a8a; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
+              <button type="button" class="bg-preset-btn" data-color="#064e3b" style="background:#064e3b; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
+              <button type="button" class="bg-preset-btn" data-color="#7f1d1d" style="background:#7f1d1d; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
+              <button type="button" class="bg-preset-btn" data-color="#78350f" style="background:#78350f; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
+              <button type="button" class="bg-preset-btn" data-color="#134e4a" style="background:#134e4a; width:24px; height:24px; border:1px solid var(--border); cursor:pointer;"></button>
             </div>
           </div>
         </div>
@@ -158,6 +158,12 @@
 
           <!-- 地図領域 -->
           <div style="display: flex; flex-direction: column; min-height: 400px; border: 1px solid var(--border);">
+            <div style="padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; gap: 8px;">
+              <input type="text" id="addressSearchInput" class="form-input" placeholder="住所や場所名で検索 (例: 東京タワー)" style="flex: 1;">
+              <button type="button" id="addressSearchBtn" class="btn btn-sm">
+                <i class="fa-solid fa-magnifying-glass"></i> 検索
+              </button>
+            </div>
             <div style="padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 0.72rem; color: var(--text-muted);">
               地図クリックで緯度経度を自動入力
             </div>

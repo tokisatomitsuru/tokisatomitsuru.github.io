@@ -20,6 +20,10 @@ const locationCountSpan = document.getElementById("locationCount");
 const toast = document.getElementById("toast");
 const toastMsg = document.getElementById("toastMsg");
 
+// 住所検索関連
+const addressSearchInput = document.getElementById("addressSearchInput");
+const addressSearchBtn = document.getElementById("addressSearchBtn");
+
 // 感度・表示設定関連
 let currentSettings = {};
 const settingTriggerDistanceInput = document.getElementById("settingTriggerDistance");
@@ -43,6 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
   document.getElementById("importFile").addEventListener("change", importData);
   document.getElementById("resetDefaultsBtn").addEventListener("click", resetToDefaults);
+
+  addressSearchBtn.addEventListener("click", searchAddress);
+  addressSearchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      searchAddress();
+    }
+  });
 });
 
 // 感度・表示設定パネルの初期化
@@ -119,37 +131,78 @@ function initMap() {
   map.on("click", (e) => {
     const lat = parseFloat(e.latlng.lat.toFixed(6));
     const lng = parseFloat(e.latlng.lng.toFixed(6));
-    
-    locLatInput.value = lat;
-    locLngInput.value = lng;
-    
-    // 一時ピンを更新
-    if (tempMarker) {
-      tempMarker.setLatLng(e.latlng);
-    } else {
-      tempMarker = L.marker(e.latlng, { 
-        draggable: true,
-        icon: L.divIcon({
-          className: "temp-map-marker",
-          html: `<i class="fa-solid fa-location-dot" style="color: #3b82f6; font-size: 24px; text-shadow: 0 0 8px rgba(59,130,246,0.6);"></i>`,
-          iconSize: [24, 24],
-          iconAnchor: [12, 24]
-        })
-      }).addTo(map);
-      
-      // ドラッグ完了イベント
-      tempMarker.on("dragend", (event) => {
-        const marker = event.target;
-        const position = marker.getLatLng();
-        locLatInput.value = parseFloat(position.lat.toFixed(6));
-        locLngInput.value = parseFloat(position.lng.toFixed(6));
-      });
-    }
-    
+    setTempMarkerPosition(lat, lng);
     showToast(`位置を選択しました (緯度: ${lat}, 経度: ${lng})`);
   });
-  
+
   updateMapMarkers();
+}
+
+// 入力欄と一時ピンを指定座標に更新する (地図クリック・住所検索で共用)
+function setTempMarkerPosition(lat, lng) {
+  locLatInput.value = lat;
+  locLngInput.value = lng;
+
+  if (tempMarker) {
+    tempMarker.setLatLng([lat, lng]);
+  } else {
+    tempMarker = L.marker([lat, lng], {
+      draggable: true,
+      icon: L.divIcon({
+        className: "temp-map-marker",
+        html: `<i class="fa-solid fa-location-dot" style="color: #3b82f6; font-size: 24px; text-shadow: 0 0 8px rgba(59,130,246,0.6);"></i>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 24]
+      })
+    }).addTo(map);
+
+    // ドラッグ完了イベント
+    tempMarker.on("dragend", (event) => {
+      const marker = event.target;
+      const position = marker.getLatLng();
+      locLatInput.value = parseFloat(position.lat.toFixed(6));
+      locLngInput.value = parseFloat(position.lng.toFixed(6));
+    });
+  }
+}
+
+// 住所・場所名から緯度経度を検索する (OpenStreetMap Nominatim)
+async function searchAddress() {
+  const query = addressSearchInput.value.trim();
+  if (!query) {
+    showToast("検索したい住所や場所名を入力してください");
+    return;
+  }
+
+  const originalBtnHtml = addressSearchBtn.innerHTML;
+  addressSearchBtn.disabled = true;
+  addressSearchBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 検索中';
+
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+    const res = await fetch(url, { headers: { "Accept-Language": "ja" } });
+
+    if (!res.ok) throw new Error(`検索リクエストが失敗しました (${res.status})`);
+
+    const results = await res.json();
+    if (!results || results.length === 0) {
+      showToast(`「${query}」が見つかりませんでした`);
+      return;
+    }
+
+    const lat = parseFloat(parseFloat(results[0].lat).toFixed(6));
+    const lng = parseFloat(parseFloat(results[0].lon).toFixed(6));
+
+    setTempMarkerPosition(lat, lng);
+    map.setView([lat, lng], 16);
+    showToast(`「${results[0].display_name}」が見つかりました`);
+  } catch (err) {
+    console.error(err);
+    showToast("検索中にエラーが発生しました");
+  } finally {
+    addressSearchBtn.disabled = false;
+    addressSearchBtn.innerHTML = originalBtnHtml;
+  }
 }
 
 // 地図のピンを全更新
