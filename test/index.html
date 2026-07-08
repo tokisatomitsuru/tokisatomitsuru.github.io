@@ -16,6 +16,18 @@
 </head>
 <body>
 
+  <!-- 起動時の同意オーバーレイ (音声再生・方位センサーの許可をまとめて取得) -->
+  <div id="startOverlay" class="modal-overlay active">
+    <div class="flat-modal start-overlay-content">
+      <i class="fa-solid fa-volume-high start-overlay-icon"></i>
+      <h3>音を再生してもいいですか？</h3>
+      <p>目的地に近づくと、音声や動画が自動的に再生されます。</p>
+      <button id="startConsentBtn" class="btn btn-primary" style="width: 100%;">
+        <i class="fa-solid fa-check"></i> はい、体験を始める
+      </button>
+    </div>
+  </div>
+
   <!-- 画面上部の最小限のコントロール -->
   <div class="minimal-nav">
     <span id="trackingStatus" class="minimal-status">

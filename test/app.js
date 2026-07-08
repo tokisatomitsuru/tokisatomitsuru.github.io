@@ -37,6 +37,10 @@ const proximityFadeContent = document.getElementById("proximityFadeContent");
 const directionHud = document.getElementById("directionHud");
 const directionArrow = document.getElementById("directionArrow");
 
+// 起動時の同意オーバーレイ
+const startOverlay = document.getElementById("startOverlay");
+const startConsentBtn = document.getElementById("startConsentBtn");
+
 // シミュレータ関連
 const simToggleBtn = document.getElementById("simToggleBtn");
 const simPanel = document.getElementById("simPanel");
@@ -95,13 +99,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === mediaModal) closeMediaModal();
   });
 
-  // 初回タップでメディア再生と方位センサーを事前にアンロックしておく
-  // (これにより、目的地到達時にタップなしで自動再生できる)
-  document.addEventListener("pointerdown", primeInteraction, { once: true });
-
-  // 即座にGPS開始（スタートオーバーレイなし）
-  initMap();
-  startTracking();
+  // 「はい、体験を始める」ボタン: 音声再生と方位センサーの許可をまとめて取得してから開始
+  startConsentBtn.addEventListener("click", () => {
+    startOverlay.classList.remove("active");
+    primeInteraction();
+    initMap();
+    startTracking();
+  });
 });
 
 // 初回タップ時の下準備: 自動再生の解禁 + 方位センサーの許可・購読開始
