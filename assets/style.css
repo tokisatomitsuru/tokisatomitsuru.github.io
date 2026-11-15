@@ -276,15 +276,15 @@ main > hr { margin: 32px 0 0; }
 .card-detail { width: 100%; padding-top: 16px; }
 /* 「JP:」「EN:」のぶら下げインデント */
 .card-line { margin: 0; font-size: 0.8em; line-height: 1.5; text-indent: -1.8em; padding-left: 1.8em; }
-.card-foot { margin-top: 1.5em; text-align: right; }
-.card-name,
-.card-meta { margin: 0; font-size: 10px; line-height: 1.5; }
+/* 作家名と年：題名の文字の頭（JP: のあと）にそろえて左寄せ。名前は小さく薄く、年は少しはっきり */
+.card-foot { margin-top: 1em; font-size: 0.8em; padding-left: 1.8em; }
+.card-name { margin: 0; font-size: 0.85em; line-height: 1.5; opacity: 0.7; }
+.card-meta { margin: 0.2em 0 0; font-size: 0.85em; line-height: 1.5; font-weight: 500; letter-spacing: 0.06em; }
 
 @media (min-width: 640px) {
   .card-wrap { display: flex; padding: 20px 16px; }
   .card-img { flex: 0 0 33.333%; }
-  .card-detail { width: 75%; padding: 0 0 2.5em 28px; }
-  .card-foot { position: absolute; right: 20px; bottom: 20px; margin: 0; }
+  .card-detail { width: 75%; padding: 0 0 0 28px; }
 }
 
 /* ---------- フッター ---------- */
@@ -344,10 +344,12 @@ main > hr { margin: 32px 0 0; }
   margin-top: 0.9em;
   padding-left: calc(2.6em * 1.05 / 0.85);
   font-size: 0.85em;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  line-height: 1.6;
   opacity: 0.9;
 }
+/* 年の上に作家名があれば、名前は小さく薄く、年は少しはっきり（カードと同じ見せ方） */
+.doc .doc-title + .caption .cap-lead { font-size: 0.9em; opacity: 0.7; }
+.doc .doc-title + .caption .cap-last { display: inline-block; margin-top: 0.2em; font-weight: 500; letter-spacing: 0.06em; }
 
 /* ---------- ページ送り（元サイトの Prev / Next） ---------- */
 .pager { display: flex; justify-content: center; align-items: center; gap: 1.5rem; margin-top: 32px; }
