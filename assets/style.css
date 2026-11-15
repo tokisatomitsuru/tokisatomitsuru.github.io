@@ -1,7 +1,6 @@
 /* tokisato.info（AstroPaper ベース）に合わせたデザイン */
 
-:root,
-html[data-theme="light"] {
+:root {
   --fill: rgb(251, 254, 251);
   --text: rgb(40, 39, 40);
   --accent: rgb(40, 39, 40);
@@ -12,29 +11,6 @@ html[data-theme="light"] {
   color-scheme: light;
 }
 
-html[data-theme="dark"] {
-  --fill: rgb(47, 55, 65);
-  --text: rgb(230, 230, 230);
-  --accent: rgb(230, 230, 230);
-  --card: rgb(63, 75, 90);
-  --card-muted: rgb(89, 107, 129);
-  --border: rgb(59, 70, 85);
-  --hover: rgba(255, 170, 170, 0.22);
-  color-scheme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme]) {
-    --fill: rgb(47, 55, 65);
-    --text: rgb(230, 230, 230);
-    --accent: rgb(230, 230, 230);
-    --card: rgb(63, 75, 90);
-    --card-muted: rgb(89, 107, 129);
-    --border: rgb(59, 70, 85);
-    --hover: rgba(255, 170, 170, 0.22);
-    color-scheme: dark;
-  }
-}
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -106,8 +82,7 @@ main,
   gap: 4px;
 }
 
-.site-nav a,
-#theme-btn {
+.site-nav a {
   display: block;
   padding: 4px 12px;
   font-weight: 500;
@@ -118,19 +93,6 @@ main,
   text-underline-offset: 4px;
 }
 
-#theme-btn {
-  background: none;
-  border: 0;
-  color: inherit;
-  cursor: pointer;
-  padding: 4px 8px;
-  line-height: 0;
-}
-#theme-btn svg { width: 24px; height: 24px; fill: currentColor; }
-#theme-btn:hover { opacity: 0.75; }
-#sun-svg { display: none; }
-html[data-theme="dark"] #moon-svg { display: none; }
-html[data-theme="dark"] #sun-svg { display: block; }
 
 .menu-toggle {
   display: none;
@@ -357,3 +319,14 @@ main > hr { margin: 32px 0 0; }
 a.pager-link:hover { opacity: 0.75; }
 .pager-link.disabled { opacity: 0.35; }
 .pager-count { font-size: 12px; opacity: 0.7; }
+
+/* 日付で始まる行（CV・NEWS）：日付を左の列にして、本文の頭をそろえる。折り返しても日付の下に回り込まない */
+.doc .dated { display: flex; gap: 1.25em; }
+.doc .dated .date {
+  flex: 0 0 auto;
+  min-width: 4.6em; /* 「2025.08」が入る幅。年だけの行（2010）も同じ列にそろう */
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+.doc .dated .dated-text { flex: 1 1 auto; min-width: 0; }
+.doc .dated + .dated { margin-top: 0.5em; }
